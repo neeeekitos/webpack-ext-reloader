@@ -1,7 +1,6 @@
 {
-  "name": "webpack-ext-reloader",
+  "name": "@cedelabs/webpack-ext-reloader",
   "version": "1.1.9",
-  "private": false,
   "description": "Watch for file changes and reload WebExtensions on browsers.",
   "main": "dist/webpack-ext-reloader.js",
   "bin": "./dist/webpack-ext-reloader-cli.js",
@@ -115,5 +114,9 @@
     "webpack": "5.75.0",
     "webpack-bundle-analyzer": "4.7.0",
     "webpack-cli": "4.10.0"
+  },
+  "volta": {
+    "node": "18.12.1",
+    "yarn": "4.0.0-rc.51"
   }
 }

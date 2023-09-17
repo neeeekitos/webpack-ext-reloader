@@ -1,6 +1,8 @@
 # Webpack Extension Reloader
 
-A Webpack plugin to automatically reload browser extensions during development.
+A Webpack plugin to automatically reload browser extensions during development. It's a fork of https://github.com/rubenspgcavalcante/webpack-extension-reloader, that supports webpack v5 and manifest v3.
+
+Deployed to https://www.npmjs.com/package/@cedelabs/webpack-ext-reloader.
 
 <div align="center">
   <a href="https://github.com/webpack/webpack">

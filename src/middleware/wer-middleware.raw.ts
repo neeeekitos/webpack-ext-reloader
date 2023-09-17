@@ -5,15 +5,12 @@
 /*  This will be converted into a lodash templ., any  */
 /*  external argument must be provided using it       */
 /* -------------------------------------------------- */
-(function(window) {
-
-  const injectionContext = this || window || {browser: null};
+(function() {
 
   (function() {
     `<%= polyfillSource %>`;
   })();
 
-  const { browser }: any = injectionContext || {};
   const signals: any = JSON.parse('<%= signals %>');
   const config: any = JSON.parse('<%= config %>');
 
@@ -28,7 +25,9 @@
   } = signals;
   const { RECONNECT_INTERVAL, SOCKET_ERR_CODE_REF } = config;
 
-  const { extension, runtime, tabs } = browser;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const {runtime, tabs} = chrome;
   const manifest = runtime.getManifest();
 
   // =============================== Helper functions ======================================= //
@@ -59,6 +58,7 @@
   // ======================== Called only on background scripts ============================= //
   function backgroundWorker(socket: WebSocket) {
     runtime.onMessage.addListener((action: { type: string; payload: any }, sender) => {
+      console.log("onMessage", action.type, action.payload)
       if (action.type === SIGN_CONNECT) {
         return Promise.resolve(formatter("Connected to Web Extension Hot Reloader"));
       }
@@ -68,10 +68,15 @@
     socket.addEventListener("message", ({ data }: MessageEvent) => {
       const { type, payload } = JSON.parse(data);
 
+      // console.log("onMessage", type, payload)
+
+
       if (type === SIGN_CHANGE && (!payload || !payload.onlyPageChanged)) {
         tabs.query({ status: "complete" }).then(loadedTabs => {
           loadedTabs.forEach(
-            tab => tab.id && tabs.sendMessage(tab.id, { type: SIGN_RELOAD }),
+            // in MV3 tabs.sendMessage returns a Promise and we need to catch the errors
+            // https://groups.google.com/a/chromium.org/g/chromium-extensions/c/st_Nh7j3908/m/1muOgSX5AwAJ
+            tab => tab.id && tabs.sendMessage(tab.id, { type: SIGN_RELOAD })?.catch(() => null),
           );
           socket.send(
             JSON.stringify({
@@ -117,6 +122,7 @@
     runtime.sendMessage({ type: SIGN_CONNECT }).then(msg => console.info(msg));
 
     runtime.onMessage.addListener(({ type, payload }: { type: string; payload: any }) => {
+      console.log("onMessage", type, payload)
       switch (type) {
         case SIGN_CHANGE:
           logger("Detected Changes. Reloading...");
@@ -137,9 +143,9 @@
 
   // ======================= Bootstraps the middleware =========================== //
   runtime.reload
-    ? extension.getBackgroundPage() === window ? backgroundWorker(new WebSocket(wsHost)) : extensionPageWorker()
-    : contentScriptWorker();
-})(window);
+// in MV3 background service workers don't have access to the DOM
+? (typeof window === 'undefined') ? backgroundWorker(new WebSocket(wsHost)) : extensionPageWorker()    : contentScriptWorker();
+})();
 
 /* ----------------------------------------------- */
 /* End of Webpack Hot Extension Middleware  */
