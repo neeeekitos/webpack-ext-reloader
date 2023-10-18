@@ -58,7 +58,6 @@
   // ======================== Called only on background scripts ============================= //
   function backgroundWorker(socket: WebSocket) {
     runtime.onMessage.addListener((action: { type: string; payload: any }, sender) => {
-      console.log("onMessage", action.type, action.payload)
       if (action.type === SIGN_CONNECT) {
         return Promise.resolve(formatter("Connected to Web Extension Hot Reloader"));
       }
@@ -67,9 +66,6 @@
 
     socket.addEventListener("message", ({ data }: MessageEvent) => {
       const { type, payload } = JSON.parse(data);
-
-      // console.log("onMessage", type, payload)
-
 
       if (type === SIGN_CHANGE && (!payload || !payload.onlyPageChanged)) {
         tabs.query({ status: "complete" }).then(loadedTabs => {
@@ -122,7 +118,6 @@
     runtime.sendMessage({ type: SIGN_CONNECT }).then(msg => console.info(msg));
 
     runtime.onMessage.addListener(({ type, payload }: { type: string; payload: any }) => {
-      console.log("onMessage", type, payload)
       switch (type) {
         case SIGN_CHANGE:
           logger("Detected Changes. Reloading...");
