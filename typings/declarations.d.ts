@@ -15,7 +15,7 @@ declare type InjectMiddleware = (assets: Record<string, any>, chunks: Set<any>) 
 declare type MiddlewareInjector = (
   { background, contentScript, extensionPage }: IEntriesOption,
   { port, reloadPage }: IMiddlewareTemplateParams,
-) => InjectMiddleware;
+) => Promise<InjectMiddleware>;
 
 declare type Triggerer = (onlyPageChanged: boolean) => Promise<any>;
 

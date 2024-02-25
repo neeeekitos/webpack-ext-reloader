@@ -74,7 +74,7 @@ export default class ExtensionReloaderImpl extends AbstractPluginReloader implem
     return { contentOrBgChanged, onlyPageChanged };
   }
 
-  public _registerPlugin(compiler: Compiler) {
+  public async _registerPlugin(compiler: Compiler) {
     const { reloadPage, port, entries, manifest } = merge(defaultOptions, this._opts);
 
     const parsedEntries: IEntriesOption = manifest
@@ -86,7 +86,7 @@ export default class ExtensionReloaderImpl extends AbstractPluginReloader implem
       : entries;
 
     this._eventAPI = new CompilerEventsFacade(compiler);
-    this._injector = middlewareInjector(parsedEntries, { port, reloadPage });
+    this._injector = await middlewareInjector(parsedEntries, { port, reloadPage });
     this._eventAPI.afterOptimizeChunks((comp, chunks) => {
       comp.assets = {
         ...comp.assets,
